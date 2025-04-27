@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Generator</title>
+  <link rel="stylesheet" href="style.css"> <!-- Link to your CSS file -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="main.js"></script>
+
+</head>
+<body>
+
+  <div class="container">
+    <h1>Certificate Generator</h1>
+    <form id="certificateForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+
+      <label for="passport">Passport No.:</label>
+      <input type="text" id="passport" required>
+
+      <label for="course">Course Name:</label>
+      <input type="text" id="course" required>
+
+      <button type="submit">Generate Certificate</button>
+    </form>
+    <div id="alertContainer"></div> <!-- Alert messages will go here -->
+  </div>
+
+ </body>
+</html>

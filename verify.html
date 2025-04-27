@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Verification</title>
+</head>
+<body>
+    <h1>Certificate Verification</h1>
+    <div id="certificateDetails">
+        <p>Loading certificate details...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKVIy0MUilyz0LGjaxVifXm_iDdIyd9FE",
+            authDomain: "certificate-generator-59024.firebaseapp.com",
+            projectId: "certificate-generator-59024",
+            storageBucket: "certificate-generator-59024.firebasestorage.app",
+            messagingSenderId: "566209550951",
+            appId: "1:566209550951:web:f8658bc62ee9315bcb52c2",
+            measurementId: "G-GYVN526CFP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Get the docId from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const docId = urlParams.get("docId");
+
+        // Fetch the document from Firestore
+        const docRef = doc(db, "certificates", docId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            // Display certificate details
+            const certificateData = docSnap.data();
+            document.getElementById("certificateDetails").innerHTML = `
+                <p><strong>Name:</strong> ${certificateData.name}</p>
+                <p><strong>Passport/DOB:</strong> ${certificateData.dob_or_passport}</p>
+                <p><strong>Course:</strong> ${certificateData.course}</p>
+                <p><strong>Issue Date:</strong> ${certificateData.issue_date.toDate().toLocaleString()}</p>
+                <p><strong>Verification Link:</strong> <a href="${window.location.href}">${window.location.href}</a></p>
+            `;
+        } else {
+            document.getElementById("certificateDetails").innerHTML = "<p>Certificate not found.</p>";
+        }
+    </script>
+</body>
+</html>

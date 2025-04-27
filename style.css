@@ -1,0 +1,105 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    padding: 20px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+  
+  /* Container to center content */
+  .container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+  }
+  
+  /* Title styling */
+  h1 {
+    text-align: center;
+    color: #4CAF50;
+    margin-bottom: 20px;
+  }
+  
+  /* Form container */
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Input field styling */
+  input {
+    padding: 12px;
+    margin: 10px 0;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  input:focus {
+    border-color: #4CAF50;
+    outline: none;
+  }
+  
+  /* Button styling */
+  button {
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Alert messages (for success and errors) */
+  .alert {
+    padding: 10px;
+    margin-top: 20px;
+    color: #fff;
+    border-radius: 5px;
+  }
+  
+  .alert-success {
+    background-color: #4CAF50;
+  }
+  
+  .alert-error {
+    background-color: #f44336;
+  }
+  
+  /* Optional: Adding some responsive design */
+  @media (max-width: 600px) {
+    body {
+      padding: 10px;
+    }
+  
+    .container {
+      width: 100%;
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 1.5em;
+    }
+  
+    input, button {
+      font-size: 14px;
+    }
+  }
+  
