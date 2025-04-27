@@ -30,42 +30,65 @@ document.getElementById('certificateForm').addEventListener('submit', async (e) 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  // Set up fonts and text styles
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0); // Default black text color
-  
-  // Draw border around the certificate (simple rectangle)
-  doc.setLineWidth(1);
-  doc.rect(10, 10, 190, 277); // x, y, width, height
+  // Register Playfair Display font if available
+  if (doc.addFileToVFS && doc.addFont) {
+    // The PlayfairDisplay-normal.js script should register the font globally
+    doc.addFont('PlayfairDisplay-normal.ttf', 'PlayfairDisplay', 'normal');
+  }
 
-  // Title of the certificate
-  doc.setFontSize(24);
+  // Set up fonts and text styles
+  doc.setFont("PlayfairDisplay", "normal");
   doc.setTextColor(0, 0, 128); // Dark blue color
-  doc.text("Certificate of Completion", 105, 40, { align: "center" });
+  doc.setFontSize(28);
+  doc.text("Certificate of Completion", 105, 48, { align: "center" });
 
   // Add name, passport number, and course
+  doc.setFont("PlayfairDisplay", "normal");
+  doc.setFontSize(18);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`This is to certify that`, 105, 70, { align: "center" });
+  doc.setFontSize(20);
+  doc.text(name, 105, 82, { align: "center" });
+  doc.setFontSize(14);
+  doc.text(`Passport No/ DOB: ${passport}`, 105, 96, { align: "center" });
   doc.setFontSize(16);
-  doc.setTextColor(0, 0, 0); // Black color for the body text
-  doc.text(`This is to certify that ${name}`, 105, 60, { align: "center" });
-  doc.text(`Passport No/ DOB: ${passport}`, 105, 70, { align: "center" });
-  doc.text(`has successfully completed the course titled ${course}.`, 105, 80, { align: "center" });
+  doc.text(`has successfully completed the course titled`, 105, 110, { align: "center" });
+  doc.setFontSize(18);
+  doc.text(course, 105, 122, { align: "center" });
 
   // Additional description about the course
+  doc.setFont("PlayfairDisplay", "normal");
   doc.setFontSize(12);
-  doc.text("The course was designed to enhance the participant's knowledge relevant to the field,", 105, 100, { align: "center" });
-  doc.text(name + " has demonstrated a comprehensive understanding and commitment ", 105, 110, { align: "center" });
-  doc.text(name + "throughout the program.", 105, 120, { align: "center" });
-  doc.text("We wish him/her continued success in their future endeavors.", 105, 130, { align: "center" });
+  let descY = 140;
+  doc.text("The course was designed to enhance the participant's knowledge relevant to the field,", 105, descY, { align: "center" });
+  descY += 10;
+  doc.text(name + " has demonstrated a comprehensive understanding and commitment", 105, descY, { align: "center" });
+  descY += 10;
+  doc.text(name + " throughout the program.", 105, descY, { align: "center" });
+  descY += 10;
+  doc.text("We wish him/her continued success in their future endeavors.", 105, descY, { align: "center" });
 
   // Footer with issuer's name
-  doc.text("Issued by: Mishuk", 105, 160, { align: "center" });
-  
-  // Add Verification URL to the certificate
-  doc.setFontSize(5);
-  doc.setTextColor(0, 0, 255); // Blue color for the verification link
-  doc.text("Certificate Verification: ", 105, 275, { align: "center" });
-  
+  doc.setFont("PlayfairDisplay", "normal");
+  doc.setFontSize(13);
+  doc.text("Issued by: Mishuk", 105, 200, { align: "center" });
 
+  // --- UI Improvements ---
+  // Add a refined border for a more professional look
+  doc.setDrawColor(44, 62, 80); // Deep navy/dark gray color
+  doc.setLineWidth(1.5); // Thinner border
+  doc.rect(15, 15, 180, 267, 'S');
+
+  // Add a signature line
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.5);
+  doc.line(60, 215, 150, 215); // x1, y1, x2, y2
+  doc.setFont("PlayfairDisplay", "normal");
+  doc.setFontSize(11);
+  doc.text("Signature", 105, 222, { align: "center" });
+
+  // Add a seal image (seal.png) at the top right
+  doc.addImage('seal.png', 'PNG', 155, 35, 40, 40); // x, y, width, height
 
   // Store certificate data in Firestore
   try {
@@ -78,20 +101,51 @@ document.getElementById('certificateForm').addEventListener('submit', async (e) 
       verified: true // Mark certificate as verified
     });
 
-    // Update the certificate URL with the verification link
+    // Generate the verification URL
     const verificationURL = `${window.location.origin}/verify.html?docId=${docRef.id}`;
-    doc.text(verificationURL, 105, 280, { align: "center" });
 
-    // Optionally, update the Firestore document with the verification URL
-    await addDoc(collection(db, "certificates"), {
-      certificate_verification_url: verificationURL
+    // Generate QR code as a data URL using QRCode.js
+    const qrDiv = document.createElement('div');
+    new window.QRCode(qrDiv, {
+      text: verificationURL,
+      width: 80,
+      height: 80,
+      correctLevel: window.QRCode.CorrectLevel.H
     });
+
+    // Wait for QR code to render, then add to PDF and save
+    setTimeout(async () => {
+      let qrDataUrl = '';
+      const qrImg = qrDiv.querySelector('img');
+      if (qrImg) {
+        qrDataUrl = qrImg.src;
+      } else {
+        // fallback for some browsers
+        const canvas = qrDiv.querySelector('canvas');
+        if (canvas) {
+          qrDataUrl = canvas.toDataURL('image/png');
+        }
+      }
+
+      // Add QR code image to the PDF
+      if (qrDataUrl) {
+        doc.addImage(qrDataUrl, 'PNG', 90, 245, 30, 30); // x, y, width, height
+        doc.setFont("PlayfairDisplay", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 128);
+        doc.text("Scan to verify certificate", 105, 282, { align: "center" });
+      }
+
+      // Optionally, update the Firestore document with the verification URL
+      await addDoc(collection(db, "certificates"), {
+        certificate_verification_url: verificationURL
+      });
       // Save the certificate as a PDF
-    doc.save(`${name}_certificate.pdf`);
+      doc.save(`${name}_certificate.pdf`);
 
-
-    // Alert the user that the certificate was created successfully
-    alert("Certificate created and stored successfully!");
+      // Alert the user that the certificate was created successfully
+      alert("Certificate created and stored successfully!");
+    }, 150); // 150ms delay to ensure QR code is rendered
   } catch (error) {
     // Handle errors
     alert("Error creating certificate: " + error.message);
