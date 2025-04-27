@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Modular Firebase SDK will be imported in the script below -->
+</head>
+
+<body>
+  <div class="container">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" required>
+      <button type="submit">Login</button>
+    </form>
+    <div id="loginError" class="alert alert-error" style="display:none;"></div>
+  </div>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+
+    // Firebase config (same as main.js)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKVIy0MUilyz0LGjaxVifXm_iDdIyd9FE",
+      authDomain: "certificate-generator-59024.firebaseapp.com",
+      projectId: "certificate-generator-59024",
+      storageBucket: "certificate-generator-59024.firebasestorage.app",
+      messagingSenderId: "566209550951",
+      appId: "1:566209550951:web:f8658bc62ee9315bcb52c2",
+      measurementId: "G-GYVN526CFP"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = 'index.html';
+        })
+        .catch((error) => {
+          document.getElementById('loginError').style.display = 'block';
+          document.getElementById('loginError').textContent = error.message;
+        });
+    });
+  </script>
+</body>
+
+</html>
